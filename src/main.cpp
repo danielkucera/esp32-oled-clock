@@ -6,6 +6,7 @@
 #include <WiFi.h> // for WiFi shield
 //#include <WiFi101.h> // for WiFi 101 shield or MKR1000
 #include <WiFiUdp.h>
+#include <Preferences.h>
 
 #include "font.h"
 
@@ -14,11 +15,14 @@ const char *password = "*";
 
 SSD1306  display(0x3c, 4, 15);
 WiFiUDP ntpUDP;
+Preferences preferences;
+
+int offset = 0;
 
 // You can specify the time server pool and the offset (in seconds, can be
 // changed later with setTimeOffset() ). Additionaly you can specify the
 // update interval (in milliseconds, can be changed using setUpdateInterval() ).
-NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200, 60000);
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
 void display_text(String text){
   display.setColor(WHITE);
@@ -29,6 +33,14 @@ void display_text(String text){
 }
 
 void setup(){
+  preferences.begin("NTP", true);
+  offset = preferences.getInt("offset", 0);
+  preferences.end();
+
+  timeClient.setTimeOffset(offset*3600);
+
+  pinMode(0,INPUT);
+  digitalWrite(0,HIGH);
 
   pinMode(16,OUTPUT);
   digitalWrite(16, LOW);    // set GPIO16 low to reset OLED
@@ -58,10 +70,22 @@ void setup(){
 char buffer[5];
 
 void loop() {
+  if (digitalRead(0) == 0){
+    offset += 1;
+    if (offset > 14)
+      offset = -11;
+
+    timeClient.setTimeOffset(offset*3600);
+
+    preferences.begin("NTP", false);
+    preferences.putInt("offset", offset);
+    preferences.end();
+  }
+
   display.clear();
 
   //display second bar
-  display.fillRect(1, 0, 126*timeClient.getSeconds()/59, 5);
+  display.fillRect(1, 0, 126*timeClient.getSeconds()/59, 2);
 
   //display time
   sprintf(buffer, "%02d:%02d", timeClient.getHours(), timeClient.getMinutes());
