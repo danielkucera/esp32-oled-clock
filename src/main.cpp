@@ -68,6 +68,8 @@ void setup(){
 char buffer[5];
 
 void loop() {
+  timeClient.update();
+
   if (digitalRead(0) == 0){
     offset += 1;
     if (offset > 14)
