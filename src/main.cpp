@@ -9,9 +9,7 @@
 #include <Preferences.h>
 
 #include "font.h"
-
-const char *ssid     = "coloseum";
-const char *password = "*";
+#include "config.h"
 
 SSD1306  display(0x3c, 4, 15);
 WiFiUDP ntpUDP;
