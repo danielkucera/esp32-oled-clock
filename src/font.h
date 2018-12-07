@@ -1,6 +1,6 @@
 // Created by http://oleddisplay.squix.ch/ Consider a donation
 // In case of problems make sure that you are using the font file with the correct version!
-const char Dialog_plain_40[] PROGMEM = {
+const uint8_t Dialog_plain_40[] PROGMEM = {
 	0x29, // Width: 41
 	0x30, // Height: 48
 	0x20, // First Char: 32
